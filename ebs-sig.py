@@ -25,9 +25,9 @@ gpg.encoding = 'utf-8'
 for root, dirs, files in os.walk(stiFra):
   for file in files:
     if file.endswith(".xml"):
-      fulltFilnavn = os.path.join(root, file))
-      org = fulltFilnavn[:2]
-      request = fulltFilnavn[2:-4]
+      fulltFilnavn = os.path.join(root, file)
+      org = file[:2]
+      request = file[2:-4]      
       stiArr = root.split('/')
       nivaa = len(stiArr)
       if nivaa == 5:
@@ -35,7 +35,7 @@ for root, dirs, files in os.walk(stiFra):
         signDta = gpg.sign_file(stream)
         stream.close()
         utFil = stiTil + org + "/P.00091062305.002.P001." + request + ".xml"
-        fUt = open(utFil)
+        fUt = open(utFil, "w")
         fUt.write(str(signDta))
         fUt.close()
 
