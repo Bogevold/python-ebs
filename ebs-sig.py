@@ -4,33 +4,38 @@ import os, gnupg
 #Her havner produserte  filer /u01/sepa/ut/{SI – 01 -02 osv}
 #De som er tatt /u01/sepa/ut/{SI – 01 -02 osv}/tatt
 #Signeres til /u01/sg
+# Filformat:
+#     P.00091062305.002.P001.1840737.xml
+#
+# Engangsoperasjoner for å generere nøkler
+# input_data = gpg.gen_key_input(key_type="RSA", key_length=1024)
+# key = gpg.gen_key(input_data)
+
+# www https://pythonhosted.org/python-gnupg/#signing
+# Sjekk installering remote (var en link til nedlasting nede i dokumentasjonen)
+
 
 
 
 stiFra = "/u01/sepa/ut"
-stiTil = "/u01/sg"
+stiTil = "/u01/sg/"
+gpg = gnupg.GPG(gnupghome='/u01')
+gpg.encoding = 'utf-8'
 
 for root, dirs, files in os.walk(stiFra):
   for file in files:
     if file.endswith(".xml"):
-      #print(os.path.join(root, file))
+      fulltFilnavn = os.path.join(root, file))
+      org = fulltFilnavn[:2]
+      request = fulltFilnavn[2:-4]
       stiArr = root.split('/')
       nivaa = len(stiArr)
       if nivaa == 5:
-        print "Fra område: {0}".format(root)
-        print "Filenavn:   {0}".format(file)
+        stream = open(fulltFilnavn, "rb")
+        signDta = gpg.sign_file(stream)
+        stream.close()
+        utFil = stiTil + org + "/P.00091062305.002.P001." + request + ".xml"
+        fUt = open(utFil)
+        fUt.write(str(signDta))
+        fUt.close()
 
-
-# Testkode signering
-gpg = gnupg.GPG(gnupghome='/u01')
-gpg.encoding = 'utf-8'
-input_data = gpg.gen_key_input(key_type="RSA", key_length=1024)
-key = gpg.gen_key(input_data)
-stream = open('/u01/sepa/ut/SI/SI12345.xml', "rb")
-signed_data = gpg.sign_file(stream)
-f = open("/u01/test.xml.pgp", "w")
-f.write(str(signed_data))
-f.close()
-
-# www https://pythonhosted.org/python-gnupg/#signing
-# Sjekk installering remote (var en link til nedlasting nede i dokumentasjonen)
