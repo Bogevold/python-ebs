@@ -33,3 +33,4 @@ f.write(str(signed_data))
 f.close()
 
 # www https://pythonhosted.org/python-gnupg/#signing
+# Sjekk installering remote (var en link til nedlasting nede i dokumentasjonen)
