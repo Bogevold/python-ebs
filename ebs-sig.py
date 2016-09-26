@@ -19,8 +19,16 @@ import os, gnupg
 
 stiFra = "/u01/sepa/ut"
 stiTil = "/u01/sg/"
+mappingFil = "/u01/sepa/mapping.txt"
 gpg = gnupg.GPG(gnupghome='/u01')
 gpg.encoding = 'utf-8'
+mappingTabell = {}
+
+with open(mappingFil,"r") as f:
+  for line in f:
+    r = line.split()
+    r2 = [r[0], ' '.join(r[2:])]
+    mappingTabell[r[1]] = r2
 
 for root, dirs, files in os.walk(stiFra):
   for file in files:
@@ -34,7 +42,7 @@ for root, dirs, files in os.walk(stiFra):
         stream = open(fulltFilnavn, "rb")
         signDta = gpg.sign_file(stream)
         stream.close()
-        utFil = stiTil + org + "/P.00091062305.002.P001." + request + ".xml"
+        utFil = stiTil + org + "/P." + mappingTabell[org][0] + ".002.P001." + request + ".xml"
         fUt = open(utFil, "w")
         fUt.write(str(signDta))
         fUt.close()
