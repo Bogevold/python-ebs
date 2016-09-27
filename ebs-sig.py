@@ -51,7 +51,7 @@ for root, dirs, files in os.walk(stiFra):
       # Tar kun filer i ett nivå under rotkatalogen 
       if nivaa == 5:
         stream = open(fulltFilnavn, "rb")
-        signDta = gpg.sign_file(stream, passphrase='Sommer2016')
+        signDta = gpg.sign_file(stream, passphrase=nklPwd)
         stream.close()
         utFil = stiTil + MILJO + "." + mappingTabell[org][0] + ".002.P001." + request + ".xml"
         fUt = open(utFil, "w")
