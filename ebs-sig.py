@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import os, gnupg, ConfigParser, shutil
+import os, gnupg, ConfigParser, shutil, sys, base64
 #
 # Dokumentasjon for gunpg 
 # https://pythonhosted.org/python-gnupg/#signing
 # 
 
 # Sette opp konfigurasjons håndterer
+configFile = 'ebs-sig.ini'
 cfg = ConfigParser.ConfigParser()
-cfg.read('/u01/app/apps/apps_st/appl/xxsi/12.0.0/bin/ebs-sig.ini')
+cfg.read(configFile)
 
 #stiFra -> Rotkatalog for filer klare til signering
 stiFra = cfg.get('FILPLASSERINGER', 'stiFra')
@@ -16,18 +17,30 @@ stiFra = cfg.get('FILPLASSERINGER', 'stiFra')
 stiTil = cfg.get('FILPLASSERINGER', 'stiTil')
 #mappingFil -> Absolutt sti til fil som med mapping mellom distrikt og orgnr
 mappingFil = cfg.get('FILPLASSERINGER', 'mappingFil')
-#NokkelHome -> Hvor nøkler genert av gpg befinner seg
-NokkelHome = cfg.get('FILPLASSERINGER', 'NokkelHome')
-#nklPwd -> Passordet til privat nøkkel
-nklPwd = cfg.get('ANNET', 'NokkelPwd')
 
 # MILJO - Indikerer produksjon (P) eller testmiljø (T)
 MILJO = cfg.get('MODI', 'Miljo')
+
+
+#NokkelHome -> Hvor nøkler genert av gpg befinner seg
+NokkelHome = cfg.get('FILPLASSERINGER', 'NokkelHome')
+#nklPwd -> Passordet til privat nøkkel (encodet for litt sikkerhet)
+nklPwd = cfg.get('ANNET', 'NokkelPwd')
+enc = nklPwd[0:5] == "(enc)"
+if enc:
+  nklPwd = base64.b64decode(nklPwd[5:])
+else:
+  test = base64.b64encode(nklPwd)
+  cfg.set('ANNET', 'NokkelPwd', "(enc)" + test)
+  with open(configFile, 'wb') as cfgFile:
+    cfg.write(cfgFile)
+  
 
 # Initierer gnupg
 gpg = gnupg.GPG(gnupghome=NokkelHome)
 gpg.encoding = 'utf-8'
 mappingTabell = {}
+
 
 
 # Leser mappingfil til en dictionary for bruk i utsti
