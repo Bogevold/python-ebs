@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import os, gnupg, ConfigParser, shutil, sys, base64
+import os, gnupg, ConfigParser, shutil, sys, base64, inspect
 #
 # Dokumentasjon for gunpg 
 # https://pythonhosted.org/python-gnupg/#signing
 # 
 
 # Sette opp konfigurasjons håndterer
-configFile = 'ebs-sig.ini'
+scriptDir = os.path.dirname(os.path.abspath(__file__)) # absolute directory path
+configFile = scriptDir + '/ebs-sig.ini'
 cfg = ConfigParser.ConfigParser()
 cfg.read(configFile)
 
@@ -20,7 +21,6 @@ mappingFil = cfg.get('FILPLASSERINGER', 'mappingFil')
 
 # MILJO - Indikerer produksjon (P) eller testmiljø (T)
 MILJO = cfg.get('MODI', 'Miljo')
-
 
 #NokkelHome -> Hvor nøkler genert av gpg befinner seg
 NokkelHome = cfg.get('FILPLASSERINGER', 'NokkelHome')
